@@ -1,4 +1,12 @@
-# Kurumsal Ağ ve Siber Güvenlik Mimarisi Projesi (Holding & Üniversite)
+# Kurumsal Ağ ve Siber Güvenlik Mimarisi (Holding & Üniversite)
+
+[![Architecture: Zero Trust](https://img.shields.io/badge/Architecture-NIST%20SP%20800--207%20Zero--Trust-blue.svg)](#)
+[![Security Standard](https://img.shields.io/badge/Security%20Model-Strict%20Microsegmentation-darkgreen.svg)](#)
+[![Automation: Python 3](https://img.shields.io/badge/Automation-Python%203%20Standard%20Lib-yellow.svg)](#)
+[![Test Suite: 6/6 Passed](https://img.shields.io/badge/Test%20Suite-6%2F6%20Passed%20(100%25)-brightgreen.svg)](#)
+[![Hardware: Palo Alto & Fortinet](https://img.shields.io/badge/Hardware-Palo%20Alto%20%7C%20Fortinet-red.svg)](#)
+[![Backbone: 4x 10G LACP](https://img.shields.io/badge/Backbone-4x%2010G%20SFP%2B%20LACP-purple.svg)](#)
+[![SOC: 24/7 CEF & RFC5424](https://img.shields.io/badge/SOC-24%2F7%20CEF%20%7C%20RFC%205424-orange.svg)](#)
 
 **Mimar:** Kıdemli Kurumsal Ağ ve Siber Güvenlik Mimarı (Senior Enterprise Network & Security Architect)  
 **Tarih:** 2026  
@@ -14,9 +22,10 @@ Bu proje; çok şubeli, yüksek kapasiteli, akademik ve AR-GE birimlerine sahip 
 Tasarım; **Zero-Trust (NIST SP 800-207)**, **Mikro-Segmentasyon**, **Yüksek Erişilebilirlik (HA - 99.999% Uptime)** ve **Katman 7 Derin Paket İnceleme (L7 Full DPI)** prensiplerine tam uyumlu olarak inşa edilmiştir.
 
 ### Temel Mimari İlkeler:
-1. **Klasörleme İlkesi:** Projedeki her şube, ekip, firewall analizi, kurulum adımı ve izleme başlığı istisnasız ayrı bir klasörde yer almaktadır.
+1. **Klasörleme İlkesi:** Projedeki her şube, ekip, firewall analizi, kurulum adımı ve izleme başlığı İSTİSNASIZ AYRI BİR KLASÖRDE yer almaktadır.
 2. **Teknik Derinlik İlkesi:** Asla yer tutucu (placeholder) veya özet ifadeler kullanılmamış; tüm IP adresleri somut CIDR bloklarıyla (`10.x.x.x`), VLAN ID'leriyle, protokol ve portlarıyla tam tablolar halinde belgelenmiştir.
 3. **Gerçekçi Donanım:** Seçilen güvenlik duvarları için piyasada aktif kullanılan gerçek kurumsal modeller (Palo Alto PA Serisi, Fortinet FortiGate) ve gerçek throughput/SSL inspection kapasiteleri baz alınmıştır.
+4. **NetSecOps Otomasyonu:** Güvenlik kuralları kod olarak (Policy-as-Code) yönetilmekte; kural ihlalleri, mikro-segmentasyon denetimleri, vendor CLI derlemeleri ve kapasite hesaplamaları harici hiçbir üçüncü parti kütüphaneye ihtiyaç duymayan standart Python 3 scriptleriyle doğrulanmaktadır.
 
 ---
 
@@ -87,7 +96,20 @@ graph TD
 
 ---
 
-## 3. Global IP Süpernet ve VLAN Özet Planı (Summarization)
+## 3. Şube, Donanım ve Kapasite Özet Tablosu
+
+| Lokasyon / Birim | Kullanıcı / Personel | Seçilen NGFW Modeli | Donanım Mimarisi & Güçlü Yön | Hat Hızı & Taşıyıcı | HA Modeli |
+| :--- | :---: | :--- | :--- | :--- | :---: |
+| **01-Ankara Genel Merkez** | 300 Personel | **Palo Alto PA-3410** | SP3 Tek-Geçişli Mimari, 4.3 Gbps SSL Decryption, Finansal DLP, Panorama | 2x 1 Gbps Metro Ethernet (TT & Superonline) | Active / Passive |
+| **02-İstanbul Maslak** | 150 Personel | **Fortinet FortiGate 100F** | SOC4 ASIC ile donanımsal SD-WAN, 1 Gbps Threat Protection, 10G SFP+ Uplink | 500 Mbps Simetrik Fiber DIA (Yedek: 100M Fiber) | Bağımsız + SD-WAN |
+| **03-Londra Canary Wharf** | 50 VIP / Hukuk | **Palo Alto PA-440** | 0 dB Tamamen Fansız (Sessiz Kasa), Katı Geo-IP (UK/TR), mTLS ZTNA | 300 Mbps Colt Dedicated Fiber (RTT < 48ms) | Cloud ZTP + Panorama |
+| **04-Akademik Kampüs** | 10.700 (10k Öğrenci) | **Fortinet FortiGate 1800F** | NP7 ASIC ile 120M Oturum, 1.2M CPS, 11 Gbps Full DPI, Eduroam RADIUS | 4x 10G SFP+ LACP (ULAKBİM & TT Kurumsal) | Active / Passive FGCP |
+| **02-Yazılım ve DevOps** | 80 Mühendis | **L3 Core + NGFW Policy** | Dev/Stage/Prod Mutlak Mikro-Segmentasyon, MFA Bastion Host, Onaylı Repolar | 1 Gbps Adanmış Omurga (Harbor 10G DAC) | StackWise Virtual |
+| **02-AR-GE ve AI Lab** | 40 Veri Bilimci | **Air-Lock Dedicated FW** | Sıfır Egress (Zero-Leakage), Bulut Blokajı, RoCE v2 NVMe, DGX H100 Kümesi | Hava Boşluklu İzole Ada (Air-Gapped Enclave) | N+1 İzole Enclave |
+
+---
+
+## 4. Global IP Süpernet ve VLAN Özet Planı (Summarization)
 
 | Lokasyon / Birim | Süpernet Bloğu (CIDR) | Alt Ağlar (Subnets) | Gateway / L3 Sınırı | Güvenlik Bölgesi (Zone) |
 | :--- | :--- | :--- | :--- | :--- |
@@ -100,126 +122,191 @@ graph TD
 
 ---
 
-## 4. Dizin Yapısı ve Belge Kütüphanesi
+## 5. Dizin Yapısı ve Proje Kütüphanesi
 
-Tüm proje belgeleri, şartnamede belirtilen hiyerarşide tam içerikle oluşturulmuştur:
-
-```
+```text
 kurumsal-ag-guvenlik-mimarisi/
+├── README.md                                  # Ana mimari ve otomasyon rehberi (Bu dosya)
 ├── 01-subeler/
-│   ├── 01-ankara-genel-merkez/
-│   │   ├── profil.md                  # 300 personel organizasyon şeması ve kritik roller
-│   │   ├── ip-ve-vlan-plani.md        # VLAN 10, 20, 30, 99 detaylı CIDR tablosu
-│   │   ├── bant-genisligi.md          # %90 eşzamanlılık, 1.2G peak hesabı, 2x 1G SD-WAN
-│   │   ├── guvenlik-duvari-secimi.md  # Palo Alto PA-3410 ve Check Point 6600 analizi
-│   │   ├── kurulum-adimlari.md        # OOBM, Active/Passive HA, LACP, BGP, Cutover
-│   │   └── kural-seti.md              # Finans/Yönetim katı mikro-segmentasyon tablosu
-│   ├── 02-istanbul-subesi/
-│   │   ├── profil.md                  # 150 personel (Satış, Pazarlama, Saha ekipleri)
-│   │   ├── ip-ve-vlan-plani.md        # VLAN 110 (Kurumsal) & VLAN 120 (Misafir)
-│   │   ├── bant-genisligi.md          # 500M DIA, M365 yerel çıkış ve Hub IPsec tünel
-│   │   ├── guvenlik-duvari-secimi.md  # Fortinet FortiGate 100F SOC4 ASIC analizi
-│   │   ├── kurulum-adimlari.md        # WAN provisioning, SD-WAN policy, IPsec CLI
-│   │   └── kural-seti.md              # Misafir izolasyonu, M365 ve Merkez intranet kuralları
-│   ├── 03-londra-subesi/
-│   │   ├── profil.md                  # 50 personel (Uluslararası Ticaret, Hukuk, C-Level)
-│   │   ├── ip-ve-vlan-plani.md        # VLAN 210 (Kurumsal) & VLAN 299 (OOBM)
-│   │   ├── bant-genisligi.md          # 300M Simetrik, RTT < 48ms BDP hesabı ve ZTNA
-│   │   ├── guvenlik-duvari-secimi.md  # Palo Alto PA-440 (0 dB Fansız akustik tasarım)
-│   │   ├── kurulum-adimlari.md        # Cloud Zero-Touch Provisioning (ZTP) ve Panorama
-│   │   └── kural-seti.md              # Katı Geo-IP (Sadece UK ve TR) ve ZTNA HIP kuralları
-│   └── 04-akademik-sube-kampus/
-│       ├── profil.md                  # 10.000 Öğrenci, 500 Akademisyen, 200 İdari Personel
-│       ├── ip-ve-vlan-plani.md        # VLAN 300-305 (Eduroam /16 pool), 310, 320, 330
-│       ├── bant-genisligi.md          # 4.000 Peak cihaz, overbooking formülü, 10G LACP
-│       ├── guvenlik-duvari-secimi.md  # Fortinet FortiGate 1800F (NP7 ASIC 120M Oturum)
-│       ├── kurulum-adimlari.md        # 10G SFP+ Core trunk, FGCP HA, Eduroam RADIUS
-│       └── kural-seti.md              # P2P/Torrent engelleme, DNS tünelleme, LMS izolasyonu
+│   ├── 01-ankara-genel-merkez/               # 300 Personel HQ (Profil, IP, Bant Genişliği, PA-3410, HA, Kural Seti)
+│   ├── 02-istanbul-subesi/                   # 150 Personel Maslak (Profil, IP, 500M DIA, FG-100F, SD-WAN, Kural Seti)
+│   ├── 03-londra-subesi/                     # 50 Personel Canary Wharf (Profil, IP, 300M ZTNA, PA-440, ZTP, Kural Seti)
+│   └── 04-akademik-sube-kampus/              # 10k Öğrenci İncek (Profil, Eduroam /16, 10G LACP, FG-1800F, Kural Seti)
 ├── 02-ozel-ekipler/
-│   ├── 01-yazilim-ekibi/
-│   │   ├── profil.md                  # 80 Developer, DevOps ve QA mühendisi
-│   │   ├── ip-ve-vlan-plani.md        # VLAN 410 (Dev), 420 (Stage), 430 (Prod Mgmt), 440
-│   │   ├── ag-gereksinimleri.md       # CI/CD Runner, Harbor Registry 1G omurga throughput
-│   │   └── kural-seti.md              # Staging/Prod izolasyonu, Bastion MFA, onaylı repolar
-│   └── 02-arge-ekibi/
-│       ├── profil.md                  # 40 Veri Bilimci, AI/ML Araştırmacısı
-│       ├── ip-ve-vlan-plani.md        # VLAN 510 (Lab), 520 (DGX GPU), 530 (NVMe Storage)
-│       ├── izolasyon-politikasi.md    # IP koruma, DLP, Hava Kilidi (Data Air-Lock)
-│       └── kural-seti.md              # Sıfır Egress, Bulut depolama ve Git push blokajı
+│   ├── 01-yazilim-ekibi/                     # 80 Developer & DevOps (Profil, VLAN, 1G CI/CD, Bastion Kural Seti)
+│   └── 02-arge-ekibi/                        # 40 AI Araştırmacısı (Profil, Air-Gapped Lab, DLP, Sıfır Egress)
 ├── 03-guvenlik-duvarlari/
-│   ├── 01-top5-ngfw-karsilastirma/
-│   │   └── karsilastirma.md           # Palo Alto, Fortinet, Check Point, Cisco, Netgate
-│   ├── 02-neden-tercih-etmedik-analizi/
-│   │   └── opsiyonel-analiz.md        # L4 Stateful, KOBİ UTM, Salt Cloud WAF risk analizi
-│   ├── 03-kural-setleri-ve-politikalar/
-│   │   └── genel-politika.md          # Default-Deny, Least Privilege, Zone Hiyerarşisi
-│   └── 04-adim-adim-kurulum-rehberi/
-│       └── standart-devreye-alma.md   # Tüm şubeler için 8 aşamalı devreye alma metodolojisi
-└── 04-izleme-ve-yonetim/
-    ├── 01-sistematik-izleme-teknolojileri/
-    │   └── teknik-mimari.md           # NetFlow v9/IPFIX, TLS Syslog 6514, Zeek & Suricata
-    ├── 02-insani-faktor-ve-soc-operasyonu/
-    │   └── soc-yapisi.md              # L1/L2/L3 Hiyerarşisi, 7/24 Vardiya, SLA ve Playbook
-    └── 03-bant-genisligi-ve-qos-yonetimi/
-        └── qos-politikasi.md          # DSCP Matrisi (EF, AF41, AF21, CS1), Shaping vs Policing
-tools/
-├── 01-kural-dogrulayici-ve-analiz/
-│   ├── rules_schema.json              # Güvenlik duvarı kural JSON şeması
-│   ├── sample_network_rules.json      # 19 adet gerçekçi kurumsal kural veri seti
-│   └── policy_validator.py            # Mikro-segmentasyon, shadowing ve default-deny denetçisi
-├── 02-vendor-cli-donusturucu/
-│   └── vendor_exporter.py             # FortiOS (.cfg) ve PAN-OS (.set) CLI derleyicisi
-├── 03-kapasite-ve-qos-hesaplayici/
-│   └── bandwidth_engine.py            # 10k Kampüs peak/overbooking ve 10G LACP hesaplayıcısı
-├── 04-soc-telemetri-simulatoru/
-│   └── syslog_generator.py            # ArcSight CEF ve RFC 5424 sentetik SOC log üreteci
-└── 05-otomasyon-test-merkezi/
-    ├── run_all_checks.py              # Tüm suite'i tek komutla koşturan DevSecOps orkestratörü
-    └── build/                         # Otomatik derlenen Fortinet/PaloAlto/SOC artifact'ları
+│   ├── 01-top5-ngfw-karsilastirma/           # Palo Alto, Fortinet, Check Point, Cisco, Netgate derin matrisi
+│   ├── 02-neden-tercih-etmedik-analizi/      # L4 Stateful, KOBİ UTM ve Salt Cloud WAF teknik risk analizi
+│   ├── 03-kural-setleri-ve-politikalar/      # Default-Deny, Least Privilege ve Zone Hiyerarşi matrisi
+│   └── 04-adim-adim-kurulum-rehberi/         # Tüm şubeler için 8 aşamalı standart devreye alma rehberi
+├── 04-izleme-ve-yonetim/
+│   ├── 01-sistematik-izleme-teknolojileri/   # NetFlow v9/IPFIX, TLS Syslog 6514, Zeek & Suricata NDR
+│   ├── 02-insani-faktor-ve-soc-operasyonu/   # L1-L3 Personel Hiyerarşisi, 7/24 Vardiya, SLA ve SOAR döngüsü
+│   └── 03-bant-genisligi-ve-qos-yonetimi/    # DSCP Matrisi (EF, AF41, AF21, CS1), Shaping vs Policing
+├── 05-hoca-sunum-ve-savunma/
+│   └── SUNUM_VE_PROJE_SAVUNMASI.md           # Slayt özetleri ve hocanın sorabileceği 5 kritik soru & cevabı
+└── tools/
+    ├── 01-kural-dogrulayici-ve-analiz/       # rules_schema.json, sample_network_rules.json, policy_validator.py
+    ├── 02-vendor-cli-donusturucu/            # vendor_exporter.py (Fortinet & Palo Alto CLI derleyicisi)
+    ├── 03-kapasite-ve-qos-hesaplayici/       # bandwidth_engine.py (10k Kampüs kapasite ve LACP motoru)
+    ├── 04-soc-telemetri-simulatoru/          # syslog_generator.py (ArcSight CEF & RFC 5424 sentetik telemetri)
+    └── 05-otomasyon-test-merkezi/
+        ├── run_all_checks.py                 # 6 adımlık test orkestratörü
+        └── build/                            # Derlenen .cfg, .set ve .log çıktıları
 ```
 
 ---
 
-## 5. Ağ Otomasyonu ve DevSecOps Araç Seti (Network Automation & Tools)
+## 6. NetSecOps Otomasyon ve Doğrulama Katmanı (Tools Suite)
 
-Tüm araçlar harici hiçbir üçüncü parti kütüphaneye ihtiyaç duymadan, yalnızca standart Python 3 kütüphaneleri (`json`, `ipaddress`, `argparse`, `sys`, `datetime`, `random`, `subprocess`) ile yazılmıştır.
+Tüm araçlar **harici hiçbir üçüncü parti kütüphaneye ihtiyaç duymadan**, yalnızca standart Python 3 kütüphaneleri (`json`, `ipaddress`, `argparse`, `sys`, `datetime`, `random`, `subprocess`, `math`, `pathlib`) ile yazılmıştır.
 
-### 5.1. Kural Doğrulayıcı ve Mikro-Segmentasyon Denetçisi
+### 6.1. Modüller ve Yetenekleri
+
+1. **Kural Doğrulayıcı ve Mikro-Segmentasyon Denetçisi (`tools/01-kural-dogrulayici-ve-analiz/`):**
+   - `rules_schema.json`: Kurumsal güvenlik kurallarının JSON şemasını tanımlar.
+   - `sample_network_rules.json`: Ankara, Maslak, Londra, Kampüs, Dev ve AR-GE için 19 kurumsal kural içerir.
+   - `policy_validator.py`: Mikro-segmentasyon ihlallerini (Öğrenci $\rightarrow$ İdari/LMS DB yetkisiz PERMIT), 0.0.0.0/0 Any-to-Any kurallarını, kural çakışmalarını (Shadowing) ve Explicit Default-Deny varlığını denetler.
+
+2. **Vendor CLI Derleyicisi (`tools/02-vendor-cli-donusturucu/`):**
+   - `vendor_exporter.py`: Doğrulanmış kuralları doğrudan **Fortinet FortiOS (`.cfg`)** ve **Palo Alto Networks PAN-OS (`.set`)** üretim komutlarına derler.
+
+3. **Bant Genişliği ve QoS Kapasite Motoru (`tools/03-kapasite-ve-qos-hesaplayici/`):**
+   - `bandwidth_engine.py`: $N_{aktif} = Toplam \times Concurrency$, $Ham = N_{aktif} \times Hız$, $Egress = Ham / Overbooking$ formüllerini işletir. 10.000 öğrenci, 700 personel, VoIP EF ve LMS AF21 rezervasyonlarını hesaplayıp 4x 10G SFP+ LACP boyutlandırmasını raporlar.
+
+4. **SOC Telemetri ve Olay Simülatörü (`tools/04-soc-telemetri-simulatoru/`):**
+   - `syslog_generator.py`: SOC L1-L3 ekiplerini ve SIEM kurallarını test etmek amacıyla ArcSight CEF ve RFC 5424 formatlarında sentetik Port Scan, 5.2GB DLP Model Exfiltration ve Geo-IP Brute-Force logları üretir.
+
+5. **Test ve Doğrulama Orkestratörü (`tools/05-otomasyon-test-merkezi/`):**
+   - `run_all_checks.py`: Tüm araçları sırasıyla çalıştıran, ihlal tespit mekanizmasını test eden, konfigürasyonları `build/` dizinine derleyen ve genel kabul raporu üreten orkestratördür.
+
+---
+
+### 6.2. Terminal Çalıştırma Komutları
+
 ```bash
-# Standart kural denetimi
+# 1. Kural Denetimini Çalıştırma (100/100 Skor)
 python tools/01-kural-dogrulayici-ve-analiz/policy_validator.py
 
-# Yapay güvenlik ihlali enjeksiyonu ile test (Öğrenci -> İdari Sistemler ihlal yakalama)
+# 2. Mikro-Segmentasyon İhlal Yakalama Testi (Yapay ihlal enjeksiyonu)
 python tools/01-kural-dogrulayici-ve-analiz/policy_validator.py --test-violation
-```
 
-### 5.2. Vendor CLI Derleyicisi (Fortinet & Palo Alto)
-```bash
-# FortiOS formatına derle
-python tools/02-vendor-cli-donusturucu/vendor_exporter.py --target fortinet
+# 3. Kuralları Fortinet FortiOS Formatına Derleme
+python tools/02-vendor-cli-donusturucu/vendor_exporter.py --target fortinet --output tools/05-otomasyon-test-merkezi/build/fortinet_rules.cfg
 
-# PAN-OS set formatına derle ve kaydet
-python tools/02-vendor-cli-donusturucu/vendor_exporter.py --target paloalto --output build/paloalto_rules.set
-```
+# 4. Kuralları Palo Alto PAN-OS Formatına Derleme
+python tools/02-vendor-cli-donusturucu/vendor_exporter.py --target paloalto --output tools/05-otomasyon-test-merkezi/build/paloalto_rules.set
 
-### 5.3. Kampüs Bant Genişliği ve QoS Kapasite Motoru
-```bash
+# 5. 10.000 Öğrenci Kampüs Kapasite Hesabı
 python tools/03-kapasite-ve-qos-hesaplayici/bandwidth_engine.py --students 10000 --concurrency 0.40 --student-mbps 8 --staff 700 --staff-mbps 15 --overbooking 4
-```
 
-### 5.4. SOC Sentetik Telemetri Simülatörü
-```bash
-python tools/04-soc-telemetri-simulatoru/syslog_generator.py --scenario all --count 10 --format both --output tools/05-otomasyon-test-merkezi/build/soc_events.log
-```
+# 6. Sentetik SOC Olay Logları Üretme (CEF & RFC 5424)
+python tools/04-soc-telemetri-simulatoru/syslog_generator.py --scenario all --count 10 --format both --output tools/05-otomasyon-test-merkezi/build/soc_synthetic_events.log
 
-### 5.5. Bütünsel Test Orkestratörü
-```bash
-# Tek komutla tüm kuralları doğrula, CLI'ları derle, kapasiteyi hesapla ve SOC loglarını test et:
+# 7. TÜM SÜRECİ TEK KOMUTLA ÇALIŞTIRMA (DevSecOps Test Orkestratörü)
 python tools/05-otomasyon-test-merkezi/run_all_checks.py
 ```
 
 ---
 
-## 6. Doğrulama ve İnceleme
+### 6.3. Orkestratör Test Doğrulama Çıktısı (`run_all_checks.py`)
 
-Tüm dokümantasyon ve otomasyon scriptleri fiziksel dosya sisteminde `C:\Users\Aydın\.gemini\antigravity\scratch\kurumsal-ag-guvenlik-mimarisi` kök dizini altında eksiksiz yer almaktadır.
+```text
+================================================================================
+   KURUMSAL AG VE SIBER GUVENLIK MIMARISI - TEST VE OTOMASYON MERKEZI
+       Enterprise DevSecOps & Network Automation Test Suite Orchestrator
+================================================================================
+Proje Kok Dizini: C:\Users\Aydın\.gemini\antigravity\scratch\kurumsal-ag-guvenlik-mimarisi
+
+[HAZIRLIK] Derleme dizini hazirlandi: .../tools/05-otomasyon-test-merkezi/build
+
+[ADIM 1] Kural Seti Semasi, Mikro-Segmentasyon ve Default-Deny Analizi...
+  Komut: python tools/01-kural-dogrulayici-ve-analiz/policy_validator.py
+  [+] BASARILI (0.15 sn) - Cikis Kodu: 0
+      | GUVENLIK UYUM SKORU            : 100 / 100
+
+[ADIM 2] Mikro-Segmentasyon Ihlal Tespit Mekanizmasi Testi (--test-violation)...
+  Komut: python tools/01-kural-dogrulayici-ve-analiz/policy_validator.py --test-violation
+  [+] BASARILI (0.16 sn) - Cikis Kodu: 1
+      | GUVENLIK UYUM SKORU            : 65 / 100 (Ihlal basariyla yakalandi)
+
+[ADIM 3] Fortinet FortiOS Firewall Policy CLI Derlemesi...
+  Komut: python tools/02-vendor-cli-donusturucu/vendor_exporter.py --target fortinet --output build/fortinet_rules.cfg
+  [+] BASARILI (0.14 sn) - Cikis Kodu: 0
+      | [BASARILI] Yapilandirma dosyasina kaydedildi: build/fortinet_rules.cfg
+
+[ADIM 4] Palo Alto Networks PAN-OS Security Rules CLI Derlemesi...
+  Komut: python tools/02-vendor-cli-donusturucu/vendor_exporter.py --target paloalto --output build/paloalto_rules.set
+  [+] BASARILI (0.14 sn) - Cikis Kodu: 0
+      | [BASARILI] Yapilandirma dosyasina kaydedildi: build/paloalto_rules.set
+
+[ADIM 5] 10.000 Ogrencili Kampus Bant Genisligi ve 10G LACP Boyutlandirma Analizi...
+  Komut: python tools/03-kapasite-ve-qos-hesaplayici/bandwidth_engine.py --students 10000 --concurrency 0.40 --student-mbps 8 --staff 700 --staff-mbps 15 --overbooking 4
+  [+] BASARILI (0.14 sn) - Cikis Kodu: 0
+      | Toplam Gereken Bant Genisligi: 23,340.0 Mbps (23.34 Gbps)
+      | Onerilen Tasiyici Mimarisi   : 4x 10G SFP+ LACP Metro Ethernet (Dual Carrier)
+
+[ADIM 6] SOC Sentetik Telemetri Log Uretimi (CEF ve RFC 5424 Formatinda 10 Olay)...
+  Komut: python tools/04-soc-telemetri-simulatoru/syslog_generator.py --scenario all --count 10 --format both --output build/soc_synthetic_events.log
+  [+] BASARILI (0.16 sn) - Cikis Kodu: 0
+      | [BASARILI] 20 adet sentetik SOC logu kaydedildi: build/soc_synthetic_events.log
+
+--- DERLENEN CIKTI VE ARTIFACT KONTROLU ---
+  [OK] fortinet_rules.cfg         :   8847 byte (263 satir)
+  [OK] paloalto_rules.set         :   5766 byte (49 satir)
+  [OK] soc_synthetic_events.log   :   7007 byte (20 satir)
+
+================================================================================
+                    GENEL TEST VE DOGRULAMA RAPORU                             
+================================================================================
+  Adim 1: Kural Seti Semasi, Mikro-Segmentasyon ve Default-Deny A  [GECTI] (0.15 sn)
+  Adim 2: Mikro-Segmentasyon Ihlal Tespit Mekanizmasi Testi (--te  [GECTI] (0.16 sn)
+  Adim 3: Fortinet FortiOS Firewall Policy CLI Derlemesi           [GECTI] (0.14 sn)
+  Adim 4: Palo Alto Networks PAN-OS Security Rules CLI Derlemesi   [GECTI] (0.14 sn)
+  Adim 5: 10.000 Ogrencili Kampus Bant Genisligi ve 10G LACP Boyu  [GECTI] (0.14 sn)
+  Adim 6: SOC Sentetik Telemetri Log Uretimi (CEF ve RFC 5424 For  [GECTI] (0.16 sn)
+--------------------------------------------------------------------------------
+  Toplam Calisma Suresi: 0.89 saniye
+
+  ****************************************************************************
+  >>> BUTUN DOGRULAMALAR BASARIYLA TAMAMLANDI (ALL CHECKS PASSED) <<<
+  ****************************************************************************
+```
+
+---
+
+## 7. Hızlı Başlangıç (Quickstart)
+
+Projeyi doğrudan klonlayıp tüm mimariyi ve kodları test etmek için aşağıdaki adımları izleyin:
+
+```bash
+# 1. Proje dizinine geçiş yapın
+cd kurumsal-ag-guvenlik-mimarisi
+
+# 2. Python sürümünüzü kontrol edin (Python 3.10+ önerilir)
+python --version
+
+# 3. Harici paket yüklemenize gerek YOKTUR (No pip install needed!)
+# Tüm doğrulamaları tek komutla koşturun:
+python tools/05-otomasyon-test-merkezi/run_all_checks.py
+
+# 4. Derlenen konfigürasyon ve log çıktılarını inceleyin:
+cat tools/05-otomasyon-test-merkezi/build/fortinet_rules.cfg
+cat tools/05-otomasyon-test-merkezi/build/paloalto_rules.set
+cat tools/05-otomasyon-test-merkezi/build/soc_synthetic_events.log
+
+# 5. Hoca sunumu ve savunma hazırlık dokümanını inceleyin:
+cat 05-hoca-sunum-ve-savunma/SUNUM_VE_PROJE_SAVUNMASI.md
+```
+
+---
+
+## 8. Hoca Sunumu ve Savunma Kılavuzu
+
+Hocanın jüri veya ders sunumunda sorabileceği en zorlu kurumsal mühendislik soruları ve yanıtları [SUNUM_VE_PROJE_SAVUNMASI.md](file:///C:/Users/Aydın/.gemini/antigravity/scratch/kurumsal-ag-guvenlik-mimarisi/05-hoca-sunum-ve-savunma/SUNUM_VE_PROJE_SAVUNMASI.md) dosyasında belgelenmiştir:
+1. *Neden Fortinet ve Palo Alto hibrit modeli seçildi?* (SP3 vs NP7 ASIC mimari ayrımı)
+2. *10.000 öğrencinin 10G/20G LACP hesabı hangi matematiksel formüle dayanıyor?* (Peak concurrency & 1:4 overbooking)
+3. *Mikro-segmentasyon ihlalleri Python kodunda nasıl yakalanıyor?* (`ipaddress` küme kesişimleri)
+4. *Neden L4 Stateful veya KOBİ UTM kullanılmadı?* (TLS 1.3 şifre çözme ve CPU starvation analizi)
+5. *SOC yapısında eskalasyon ve SOAR müdahale döngüsü nasıl işliyor?* (L1-L3 SLA ve otomatik karantina)
