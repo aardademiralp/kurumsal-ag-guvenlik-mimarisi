@@ -79,7 +79,7 @@ graph TD
     CORE_HQ --- SPECIAL_TEAMS
 
     FW_IST <==>|500M DIA| ISP_TT
-    FW_IST <==>|IPsec Tünel (RFC 1918 Trafiği)| FW_HQ
+    FW_IST <==>|"IPsec Tünel (RFC 1918 Trafiği)"| FW_HQ
     FW_IST --- IST_USERS
     FW_IST --- IST_GUEST
 
