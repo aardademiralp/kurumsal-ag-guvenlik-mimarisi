@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EnterpriseFirewallPolicySchema",
+  "description": "Holding ve Üniversite Kurumsal Ağ ve Güvenlik Mimarisi Güvenlik Duvarı Kural Şeması",
+  "type": "object",
+  "required": ["version", "environment", "rules"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Kural seti versiyonu (örn: 1.0.0)"
+    },
+    "environment": {
+      "type": "string",
+      "enum": ["production", "staging", "development"],
+      "description": "Dağıtım ortamı"
+    },
+    "rules": {
+      "type": "array",
+      "description": "Sıralı güvenlik duvarı kuralları listesi",
+      "items": {
+        "type": "object",
+        "required": [
+          "rule_id",
+          "name",
+          "source_zone",
+          "source_cidr",
+          "dest_zone",
+          "dest_cidr",
+          "service_ports",
+          "action",
+          "threat_inspection"
+        ],
+        "properties": {
+          "rule_id": {
+            "type": ["string", "integer"],
+            "description": "Benzersiz kural kimliği (örn: R-101, CMP-01)"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 64,
+            "description": "Anlaşılır kural adı"
+          },
+          "source_zone": {
+            "type": "string",
+            "description": "Kaynak güvenlik bölgesi (Security Zone)"
+          },
+          "source_cidr": {
+            "type": "string",
+            "description": "Kaynak IPv4 CIDR bloğu (örn: 10.10.10.0/24 veya 0.0.0.0/0)"
+          },
+          "dest_zone": {
+            "type": "string",
+            "description": "Hedef güvenlik bölgesi (Security Zone)"
+          },
+          "dest_cidr": {
+            "type": "string",
+            "description": "Hedef IPv4 CIDR bloğu (örn: 10.101.30.0/24 veya 0.0.0.0/0)"
+          },
+          "service_ports": {
+            "type": "array",
+            "items": {
+              "type": ["integer", "string"]
+            },
+            "description": "İzin verilen/engellenen TCP/UDP portları veya port aralıkları (örn: [53, 443, '3200-3299'] veya ['any'])"
+          },
+          "action": {
+            "type": "string",
+            "enum": ["PERMIT", "DENY"],
+            "description": "Kural eylemi (PERMIT veya DENY)"
+          },
+          "threat_inspection": {
+            "type": "boolean",
+            "description": "L7 IPS, AV, DLP ve WildFire derin paket teftişi aktif mi"
+          },
+          "description": {
+            "type": "string",
+            "description": "Kuralın operasyonel amacı ve gerekçesi"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

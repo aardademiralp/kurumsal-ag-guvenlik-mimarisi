@@ -1,0 +1,49 @@
+# ============================================================================
+# PALO ALTO NETWORKS PAN-OS SECURITY RULES EXPORT (SET FORMAT)
+# Toplam Kural Sayisi: 19
+# ============================================================================
+set rulebase security rules "HQ_CORE_INFRA_DNS_NTP" from Trust_Corporate to Zone_DC_Services source 10.10.30.0/24 destination 10.10.100.10/32 service any application any action allow
+set rulebase security rules "HQ_CORE_INFRA_DNS_NTP" profile-setting group "Strict-Threat-Prevention"
+set rulebase security rules "HQ_CORE_INFRA_DNS_NTP" log-end yes
+set rulebase security rules "HQ_FIN_TO_SWIFT_NET" from Trust_Finance to Untrust_WAN source 10.10.20.10/32 destination 194.107.240.0/24 service any application any action allow
+set rulebase security rules "HQ_FIN_TO_SWIFT_NET" profile-setting group "Strict-Threat-Prevention"
+set rulebase security rules "HQ_FIN_TO_SWIFT_NET" log-end yes
+set rulebase security rules "HQ_FIN_TO_SAP_HANA" from Trust_Finance to Zone_ERP_HANA source 10.10.20.0/24 destination 10.10.105.10/32 service any application any action allow
+set rulebase security rules "HQ_FIN_TO_SAP_HANA" profile-setting group "Strict-Threat-Prevention"
+set rulebase security rules "HQ_FIN_TO_SAP_HANA" log-end yes
+set rulebase security rules "HQ_FIN_DIRECT_INET_DROP" from Trust_Finance to Untrust_WAN source 10.10.20.0/24 destination 0.0.0.0/0 service any application any action deny
+set rulebase security rules "HQ_FIN_DIRECT_INET_DROP" log-start yes
+set rulebase security rules "IST_GUEST_ISOLATION_DROP" from Zone_IST_Guest to Zone_IST_Trust source 172.16.20.0/24 destination 10.0.0.0/8 service any application any action deny
+set rulebase security rules "IST_GUEST_ISOLATION_DROP" log-start yes
+set rulebase security rules "IST_GUEST_INTERNET_OUT" from Zone_IST_Guest to Untrust_WAN source 172.16.20.0/24 destination 0.0.0.0/0 service any application any action allow
+set rulebase security rules "IST_GUEST_INTERNET_OUT" profile-setting group "Strict-Threat-Prevention"
+set rulebase security rules "IST_GUEST_INTERNET_OUT" log-end yes
+set rulebase security rules "IST_CORP_M365_DIA_OUT" from Zone_IST_Trust to Untrust_WAN source 10.20.10.0/24 destination 52.96.0.0/12 service any application any action allow
+set rulebase security rules "LON_GEOIP_BLOCK_NON_UK_TR" from Untrust_WAN to Zone_LON_Trust source 0.0.0.0/0 destination 10.30.10.0/24 service any application any action deny
+set rulebase security rules "LON_GEOIP_BLOCK_NON_UK_TR" log-start yes
+set rulebase security rules "LON_ZTNA_TO_ANKARA_SAP" from Zone_LON_Trust to Zone_ERP_HANA source 10.30.10.0/24 destination 10.10.105.10/32 service any application any action allow
+set rulebase security rules "LON_ZTNA_TO_ANKARA_SAP" profile-setting group "Strict-Threat-Prevention"
+set rulebase security rules "LON_ZTNA_TO_ANKARA_SAP" log-end yes
+set rulebase security rules "CMP_BLOCK_P2P_TORRENT" from Zone_Campus_Student to Untrust_WAN source 10.100.0.0/16 destination 0.0.0.0/0 service any application any action deny
+set rulebase security rules "CMP_BLOCK_P2P_TORRENT" log-start yes
+set rulebase security rules "CMP_BLOCK_DNS_TUNNELING" from Zone_Campus_Student to Untrust_WAN source 10.100.0.0/16 destination 0.0.0.0/0 service any application any action deny
+set rulebase security rules "CMP_BLOCK_DNS_TUNNELING" log-start yes
+set rulebase security rules "CMP_STUDENT_TO_ADMIN_ISOLATION" from Zone_Campus_Student to Zone_Campus_Admin source 10.100.0.0/16 destination 10.101.20.0/24 service any application any action deny
+set rulebase security rules "CMP_STUDENT_TO_ADMIN_ISOLATION" log-start yes
+set rulebase security rules "CMP_STUDENT_TO_LMS_DB_ISOLATION" from Zone_Campus_Student to Zone_Campus_DC_LMS source 10.100.0.0/16 destination 10.101.30.0/24 service any application any action deny
+set rulebase security rules "CMP_STUDENT_TO_LMS_DB_ISOLATION" log-start yes
+set rulebase security rules "CMP_STUDENT_TO_LMS_WEB_ONLY" from Zone_Campus_Student to Zone_Campus_DC_LMS source 10.100.0.0/16 destination 10.101.30.20/32 service any application any action allow
+set rulebase security rules "CMP_STUDENT_TO_LMS_WEB_ONLY" profile-setting group "Strict-Threat-Prevention"
+set rulebase security rules "CMP_STUDENT_TO_LMS_WEB_ONLY" log-end yes
+set rulebase security rules "CMP_STUDENT_INTERNET_ACCESS" from Zone_Campus_Student to Untrust_WAN source 10.100.0.0/16 destination 0.0.0.0/0 service any application any action allow
+set rulebase security rules "CMP_STUDENT_INTERNET_ACCESS" profile-setting group "Strict-Threat-Prevention"
+set rulebase security rules "CMP_STUDENT_INTERNET_ACCESS" log-end yes
+set rulebase security rules "DEV_TO_STAGING_INGRESS" from Zone_Dev_Workstation to Zone_Staging source 10.40.10.0/24 destination 10.40.20.30/32 service any application any action allow
+set rulebase security rules "DEV_TO_STAGING_INGRESS" profile-setting group "Strict-Threat-Prevention"
+set rulebase security rules "DEV_TO_STAGING_INGRESS" log-end yes
+set rulebase security rules "DEV_TO_PROD_DIRECT_SSH_DROP" from Zone_Dev_Workstation to Zone_Prod_Mgmt source 10.40.10.0/24 destination 10.40.30.0/24 service any application any action deny
+set rulebase security rules "DEV_TO_PROD_DIRECT_SSH_DROP" log-start yes
+set rulebase security rules "RND_BLOCK_CLOUD_STORAGE_EXFIL" from Zone_RnD_Enclave to Untrust_WAN source 10.50.0.0/16 destination 0.0.0.0/0 service any application any action deny
+set rulebase security rules "RND_BLOCK_CLOUD_STORAGE_EXFIL" log-start yes
+set rulebase security rules "GLOBAL_EXPLICIT_DEFAULT_DENY_ALL" from any to any source 0.0.0.0/0 destination 0.0.0.0/0 service any application any action deny
+set rulebase security rules "GLOBAL_EXPLICIT_DEFAULT_DENY_ALL" log-start yes

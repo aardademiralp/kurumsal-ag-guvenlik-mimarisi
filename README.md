@@ -162,11 +162,64 @@ kurumsal-ag-guvenlik-mimarisi/
     │   └── soc-yapisi.md              # L1/L2/L3 Hiyerarşisi, 7/24 Vardiya, SLA ve Playbook
     └── 03-bant-genisligi-ve-qos-yonetimi/
         └── qos-politikasi.md          # DSCP Matrisi (EF, AF41, AF21, CS1), Shaping vs Policing
+tools/
+├── 01-kural-dogrulayici-ve-analiz/
+│   ├── rules_schema.json              # Güvenlik duvarı kural JSON şeması
+│   ├── sample_network_rules.json      # 19 adet gerçekçi kurumsal kural veri seti
+│   └── policy_validator.py            # Mikro-segmentasyon, shadowing ve default-deny denetçisi
+├── 02-vendor-cli-donusturucu/
+│   └── vendor_exporter.py             # FortiOS (.cfg) ve PAN-OS (.set) CLI derleyicisi
+├── 03-kapasite-ve-qos-hesaplayici/
+│   └── bandwidth_engine.py            # 10k Kampüs peak/overbooking ve 10G LACP hesaplayıcısı
+├── 04-soc-telemetri-simulatoru/
+│   └── syslog_generator.py            # ArcSight CEF ve RFC 5424 sentetik SOC log üreteci
+└── 05-otomasyon-test-merkezi/
+    ├── run_all_checks.py              # Tüm suite'i tek komutla koşturan DevSecOps orkestratörü
+    └── build/                         # Otomatik derlenen Fortinet/PaloAlto/SOC artifact'ları
 ```
 
 ---
 
-## 5. Doğrulama ve İnceleme
+## 5. Ağ Otomasyonu ve DevSecOps Araç Seti (Network Automation & Tools)
 
-Tüm dokümantasyon dosyaları fiziksel dosya sisteminde `C:\Users\Aydın\.gemini\antigravity\scratch\kurumsal-ag-guvenlik-mimarisi` kök dizini altında oluşturulmuştur.
-Kullanıcı çalışma alanını bu dizine ayarlayarak projeyi doğrudan IDE üzerinde inceleyebilir.
+Tüm araçlar harici hiçbir üçüncü parti kütüphaneye ihtiyaç duymadan, yalnızca standart Python 3 kütüphaneleri (`json`, `ipaddress`, `argparse`, `sys`, `datetime`, `random`, `subprocess`) ile yazılmıştır.
+
+### 5.1. Kural Doğrulayıcı ve Mikro-Segmentasyon Denetçisi
+```bash
+# Standart kural denetimi
+python tools/01-kural-dogrulayici-ve-analiz/policy_validator.py
+
+# Yapay güvenlik ihlali enjeksiyonu ile test (Öğrenci -> İdari Sistemler ihlal yakalama)
+python tools/01-kural-dogrulayici-ve-analiz/policy_validator.py --test-violation
+```
+
+### 5.2. Vendor CLI Derleyicisi (Fortinet & Palo Alto)
+```bash
+# FortiOS formatına derle
+python tools/02-vendor-cli-donusturucu/vendor_exporter.py --target fortinet
+
+# PAN-OS set formatına derle ve kaydet
+python tools/02-vendor-cli-donusturucu/vendor_exporter.py --target paloalto --output build/paloalto_rules.set
+```
+
+### 5.3. Kampüs Bant Genişliği ve QoS Kapasite Motoru
+```bash
+python tools/03-kapasite-ve-qos-hesaplayici/bandwidth_engine.py --students 10000 --concurrency 0.40 --student-mbps 8 --staff 700 --staff-mbps 15 --overbooking 4
+```
+
+### 5.4. SOC Sentetik Telemetri Simülatörü
+```bash
+python tools/04-soc-telemetri-simulatoru/syslog_generator.py --scenario all --count 10 --format both --output tools/05-otomasyon-test-merkezi/build/soc_events.log
+```
+
+### 5.5. Bütünsel Test Orkestratörü
+```bash
+# Tek komutla tüm kuralları doğrula, CLI'ları derle, kapasiteyi hesapla ve SOC loglarını test et:
+python tools/05-otomasyon-test-merkezi/run_all_checks.py
+```
+
+---
+
+## 6. Doğrulama ve İnceleme
+
+Tüm dokümantasyon ve otomasyon scriptleri fiziksel dosya sisteminde `C:\Users\Aydın\.gemini\antigravity\scratch\kurumsal-ag-guvenlik-mimarisi` kök dizini altında eksiksiz yer almaktadır.
