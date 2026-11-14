@@ -1,0 +1,254 @@
+[
+  {
+    "id": "rule-01",
+    "name": "ANK_HQ_DNS_NTP_CORE",
+    "source": "10.10.30.0/24",
+    "destination": "10.10.100.10/32",
+    "ports": [53, 123],
+    "action": "PERMIT",
+    "rationale": "Merkez calisanlarinin Active Directory entegre guvenli DNS sorgulamasi ve Kerberos kimlik dogrulamasi icin NTP zaman esitlemesi saglamak."
+  },
+  {
+    "id": "rule-02",
+    "name": "ANK_FIN_TO_SWIFT_NET",
+    "source": "10.10.20.10/32",
+    "destination": "194.107.240.0/24",
+    "ports": [443, 10000],
+    "action": "PERMIT",
+    "rationale": "Finans ve hazine biriminin uluslararasi bankacilik ve fon transferlerini izole HSM terminali uzerinden guvenle yurutmesini saglamak."
+  },
+  {
+    "id": "rule-03",
+    "name": "ANK_FIN_TO_SAP_HANA",
+    "source": "10.10.20.0/24",
+    "destination": "10.10.105.10/32",
+    "ports": [3200, 3300, 443, 30015],
+    "action": "PERMIT",
+    "rationale": "Finans departmaninin kritik ERP modullerine ve Fiori arayuzune finansal DLP teftisi altinda kontrollu erisimini saglamak."
+  },
+  {
+    "id": "rule-04",
+    "name": "ANK_FIN_DIRECT_INET_BLOCK",
+    "source": "10.10.20.0/24",
+    "destination": "0.0.0.0/0",
+    "ports": [0],
+    "action": "DENY",
+    "rationale": "Finans ve bordro verilerinin islendigi agin genel internete dogrudan cikisini engelleyerek olasi zararli yazilim ve oltalama sizintilarini onlemek."
+  },
+  {
+    "id": "rule-05",
+    "name": "ANK_INTER_VLAN_LATERAL_DROP",
+    "source": "10.10.0.0/16",
+    "destination": "10.10.0.0/16",
+    "ports": [0],
+    "action": "DENY",
+    "rationale": "Zero-Trust mimarisi geregi kullanici departmanlarinin birbirleri arasinda dogrudan yanal hareketini (lateral movement) engelleyerek fidye yazilimi yayilimini durdurmak."
+  },
+  {
+    "id": "rule-06",
+    "name": "ANK_OOBM_BASTION_ACCESS",
+    "source": "10.10.30.5/32",
+    "destination": "10.10.99.0/24",
+    "ports": [22, 443],
+    "action": "PERMIT",
+    "rationale": "Ag anahtarlari ve guvenlik duvarlarinin donanimsal yonetim arayuzlerine yalnizca MFA korumali merkezi atlama sunucusundan (Bastion Host) erisim izni vermek."
+  },
+  {
+    "id": "rule-07",
+    "name": "IST_GUEST_ISOLATION_DROP",
+    "source": "172.16.20.0/24",
+    "destination": "10.0.0.0/8",
+    "ports": [0],
+    "action": "DENY",
+    "rationale": "Maslak ofisindeki ziyaretci ve misafir cihazlarinin kurumsal holding ic agina ve sunucularina sizmasini donanimsal olarak engellemek."
+  },
+  {
+    "id": "rule-08",
+    "name": "IST_GUEST_INTERNET_OUT",
+    "source": "172.16.20.0/24",
+    "destination": "0.0.0.0/0",
+    "ports": [80, 443],
+    "action": "PERMIT",
+    "rationale": "Misafir kullanicilarin yalnizca genel web sitelerine icerik filtreleme ve antivirus denetimi altinda kontrollu cikis yapmasini saglamak."
+  },
+  {
+    "id": "rule-09",
+    "name": "IST_CORP_M365_DIA_OUT",
+    "source": "10.20.10.0/24",
+    "destination": "52.96.0.0/12",
+    "ports": [80, 443, 3478],
+    "action": "PERMIT",
+    "rationale": "Satis ve pazarlama ekiplerinin Teams ve Office 365 bulut trafigini dogrudan yerel internetten (DIA) gecikmesiz cikararak WAN darbogazini onlemek."
+  },
+  {
+    "id": "rule-10",
+    "name": "IST_CORP_TO_HQ_RESTRICT",
+    "source": "10.20.10.0/24",
+    "destination": "10.10.20.0/24",
+    "ports": [0],
+    "action": "DENY",
+    "rationale": "Sube personelinin merkezdeki hassas yonetim ve hazine aglarina IPsec tuneli uzerinden yetkisiz erisimini engellemek."
+  },
+  {
+    "id": "rule-11",
+    "name": "LON_GEOIP_BLOCK_NON_UK_TR",
+    "source": "0.0.0.0/0",
+    "destination": "10.30.10.0/24",
+    "ports": [0],
+    "action": "DENY",
+    "rationale": "Londra subesine Birlesik Krallik (GB) ve Turkiye (TR) disindaki yuksek riskli cografyalardan gelen tunel taramalarini ve siber saldirilari sinirda drop etmek."
+  },
+  {
+    "id": "rule-12",
+    "name": "LON_ZTNA_TO_ANKARA_SAP",
+    "source": "10.30.10.0/24",
+    "destination": "10.10.105.10/32",
+    "ports": [443, 3200],
+    "action": "PERMIT",
+    "rationale": "Uluslararasi ticaret ve C-Level yoneticilerin cihaz sagligi (EDR aktif, disk sifreli) ve mTLS sertifikasi dogrulandiktan sonra SAP sistemine mikro-tunelle baglanmasini saglamak."
+  },
+  {
+    "id": "rule-13",
+    "name": "LON_BLOOMBERG_DATA_FEED",
+    "source": "10.30.10.15/32",
+    "destination": "160.43.0.0/16",
+    "ports": [443, 8194],
+    "action": "PERMIT",
+    "rationale": "Uluslararasi tahvil ve emtia islemleri icin Bloomberg finansal veri akisina dusuk gecikmeli garantili QoS hatti uzerinden erisim vermek."
+  },
+  {
+    "id": "rule-14",
+    "name": "CMP_BLOCK_P2P_TORRENT",
+    "source": "10.100.0.0/16",
+    "destination": "0.0.0.0/0",
+    "ports": [6881, 6882, 6889, 6969],
+    "action": "DENY",
+    "rationale": "Universite kampusunde telif hakki ihlali yaratan ve 10 Gbps hat kapasitesini somuren BitTorrent ve P2P protokollerini engellemek."
+  },
+  {
+    "id": "rule-15",
+    "name": "CMP_BLOCK_DNS_TUNNELING",
+    "source": "10.100.0.0/16",
+    "destination": "0.0.0.0/0",
+    "ports": [53],
+    "action": "DENY",
+    "rationale": "Ogrenci cihazlarinin DNS paketleri icerisine veri gizleyerek guvenlik duvari kisitlamalarini asmasini ve DNS tunelleme yapmasini onlemek."
+  },
+  {
+    "id": "rule-16",
+    "name": "CMP_STUDENT_TO_ADMIN_ISOLATION",
+    "source": "10.100.0.0/16",
+    "destination": "10.101.20.0/24",
+    "ports": [0],
+    "action": "DENY",
+    "rationale": "10.000 ogrencinin kisisel cihazlarinin universite idari sistemlerine, personel bordrolarina ve resmi evrak arsivine erisimini mutlak olarak izole etmek."
+  },
+  {
+    "id": "rule-17",
+    "name": "CMP_STUDENT_TO_LMS_DB_ISOLATION",
+    "source": "10.100.0.0/16",
+    "destination": "10.101.30.25/32",
+    "ports": [1521, 3306, 5432],
+    "action": "DENY",
+    "rationale": "Ogrenci aginin sinav notlari ve akademik kayitlarin tutuldugu PostgreSQL/Oracle veri tabani portlarina dogrudan baglanmasini engellemek."
+  },
+  {
+    "id": "rule-18",
+    "name": "CMP_STUDENT_TO_LMS_WEB_ONLY",
+    "source": "10.100.0.0/16",
+    "destination": "10.101.30.20/32",
+    "ports": [80, 443],
+    "action": "PERMIT",
+    "rationale": "Ogrencilerin cevrimici derslere ve sinav sistemine yalnizca WAF ve hiz kisitlamasi altindaki web on yuzu uzerinden guvenle girmesini saglamak."
+  },
+  {
+    "id": "rule-19",
+    "name": "CMP_STUDENT_INTERNET_ACCESS",
+    "source": "10.100.0.0/16",
+    "destination": "0.0.0.0/0",
+    "ports": [80, 443],
+    "action": "PERMIT",
+    "rationale": "Ogrencilerin egitim ve arastirma amaciyla genel internete 8 Mbps dinamik hiz siniri ve zararli icerik filtrelemesiyle erismesine izin vermek."
+  },
+  {
+    "id": "rule-20",
+    "name": "CMP_ACADEMIC_TO_ULAKBIM_RES",
+    "source": "10.101.10.0/24",
+    "destination": "193.140.0.0/16",
+    "ports": [80, 443],
+    "action": "PERMIT",
+    "rationale": "Akademik personelin uluslararasi bilimsel veri tabanlarina (IEEE, ScienceDirect) 10G adanmis hat uzerinden kesintisiz erisimini saglamak."
+  },
+  {
+    "id": "rule-21",
+    "name": "DEV_TO_DEVOPS_CORE_SERVICES",
+    "source": "10.40.10.0/24",
+    "destination": "10.40.40.10/32",
+    "ports": [22, 443, 5000],
+    "action": "PERMIT",
+    "rationale": "Yazilim muhendislerinin sirket ici kaynak kod deposuna ve Docker konteyner registry sunucusuna guvenli Git-SSH ve HTTPS protokolleriyle erismesini saglamak."
+  },
+  {
+    "id": "rule-22",
+    "name": "DEV_TO_STAGING_INGRESS",
+    "source": "10.40.10.0/24",
+    "destination": "10.40.20.30/32",
+    "ports": [80, 443, 8080],
+    "action": "PERMIT",
+    "rationale": "Yazilimcilarin gelistirdikleri mikroservisleri canliya almadan once Staging test ortaminda dogrulamalarina olanak tanimak."
+  },
+  {
+    "id": "rule-23",
+    "name": "DEV_TO_PROD_DIRECT_ACCESS_DROP",
+    "source": "10.40.10.0/24",
+    "destination": "10.10.105.0/24",
+    "ports": [0],
+    "action": "DENY",
+    "rationale": "DevSecOps 'Iki Kisi Kurali' uyarinca gelistiricilerin canli uretim ortamina dogrudan IP duzeyinde mudahale etmesini kesin olarak engellemek."
+  },
+  {
+    "id": "rule-24",
+    "name": "DEV_TO_BASTION_MFA_ACCESS",
+    "source": "10.40.10.0/24",
+    "destination": "10.40.30.5/32",
+    "ports": [443, 2222],
+    "action": "PERMIT",
+    "rationale": "Canli ortamda zorunlu bakim yapacak DevOps muhendislerinin oturum video kaydi ve donanimsal YubiKey MFA ile atlama sunucusuna baglanmasini saglamak."
+  },
+  {
+    "id": "rule-25",
+    "name": "RND_BLOCK_CLOUD_STORAGE_EXFIL",
+    "source": "10.50.0.0/16",
+    "destination": "0.0.0.0/0",
+    "ports": [80, 443],
+    "action": "DENY",
+    "rationale": "Yapay zeka model agirliklarinin ve tescilli algoritmalarin Google Drive, Dropbox ve WeTransfer gibi bulut depolama sitelerine sizdirilmasini (exfiltration) onlemek."
+  },
+  {
+    "id": "rule-26",
+    "name": "RND_AIRGAP_DIRECT_EGRESS_DROP",
+    "source": "10.50.20.0/24",
+    "destination": "0.0.0.0/0",
+    "ports": [0],
+    "action": "DENY",
+    "rationale": "HPC GPU sunucularini hava bosluklu (Air-Gapped) tutarak internetten gelebilecek sifirinci gun tehditlerini ve uzaktan kod calistirma aciklarini tamamen izole etmek."
+  },
+  {
+    "id": "rule-27",
+    "name": "RND_AIRLOCK_SANITIZED_INGRESS",
+    "source": "10.10.30.50/32",
+    "destination": "10.50.10.5/32",
+    "ports": [443],
+    "action": "PERMIT",
+    "rationale": "Laboratuvara girecek ham egitim veri setlerinin derin antivirus, CDR ve bicim dogrulama taramasindan gectikten sonra kontrollu girisine izin vermek."
+  },
+  {
+    "id": "rule-28",
+    "name": "GLOBAL_EXPLICIT_DEFAULT_DENY_ALL",
+    "source": "0.0.0.0/0",
+    "destination": "0.0.0.0/0",
+    "ports": [0],
+    "action": "DENY",
+    "rationale": "Zero-Trust mimarisinin temel kurali: Acikca izin verilmemis tum bilinmeyen protokol, port ve oturumlari sinirda ve merkezde kayitsiz sartsiz engellemek."
+  }
+]
